@@ -20,7 +20,7 @@ logger = logging.getLogger(__name__)
 
 # Configure Generative AI model
 model = genai.GenerativeModel('gemini-2.0-flash-exp')
-genai.configure(api_key="AIzaSyBLDyHb9zJX1AZzQSMhQNxev61M6rIgKcY")
+genai.configure(api_key="GENAI_API_KEY")
 
 # Global variable to store the vector store
 vector_store = None
