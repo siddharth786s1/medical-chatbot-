@@ -20,7 +20,7 @@ logger = logging.getLogger(__name__)
 
 # Configure Generative AI model
 model = genai.GenerativeModel('gemini-2.0-flash-exp')
-genai.configure(api_key="GENAI_API_KEY")
+genai.configure(api_key="AIzaSyBcEheIeNQwlVnAKq067CBZhqaycVhSEkw")
 
 # Global variable to store the vector store
 vector_store = None
@@ -84,16 +84,18 @@ def upload():
 @app.route('/ask', methods=['POST'])
 def ask():
     global vector_store
-    if vector_store is None:
-        return "Knowledge base is not ready. Please upload PDFs first."
-
     question = request.form['prompt']
-    # Retrieve relevant documents based on the question
-    relevant_docs = vector_store.similarity_search(question)
-    context = " ".join([doc.page_content for doc in relevant_docs])
-    
-    # Custom prompt for handling extra care for depressed people
-    custom_prompt = f"You are the best doctor. Only provide medical-related answers. Context: {context} Question: {question}"
+    context = "" # Initialize context as empty
+
+    if vector_store is not None:
+        # Retrieve relevant documents based on the question if vector_store exists
+        relevant_docs = vector_store.similarity_search(question)
+        context = " ".join([doc.page_content for doc in relevant_docs])
+        custom_prompt = f"You are the best doctor. Only provide medical-related answers. Context: {context} Question: {question}"
+    else:
+        # If no vector store, ask the question without context
+        custom_prompt = f"You are the best doctor. Only provide medical-related answers. Question: {question}"
+        flash("Knowledge base is empty. Answering based on general knowledge.") # Optional: Inform the user
 
     response = model.generate_content(custom_prompt)
     
