@@ -189,7 +189,7 @@
     <div class="messages-container" id="messages-container">
       <!-- Messages will be appended here -->
     </div>
-    <form id="chat-form" method="post">
+    <form id="chat-form" method="post" enctype="multipart/form-data">
       <div class="input-container">
         <input type="text" class="chat-input" id="chat-input" name="prompt" placeholder="Type your message...">
         <button type="submit" class="send-button" id="send-button">Send</button>
@@ -203,6 +203,7 @@
       $("#chat-form").submit(function (event) {
         event.preventDefault();
         var question = $("#chat-input").val();
+
         if (question.trim() === "") return;
 
         let userMessage = `
@@ -222,12 +223,15 @@
           </div>`;
         $("#messages-container").append(typingIndicator);
 
+        var formData = new FormData();
+        formData.append("prompt", question);
+
         $.ajax({
           type: "POST",
           url: "/ask",
-          data: {
-            'prompt': question
-          },
+          data: formData,
+          processData: false,
+          contentType: false,
           success: function (data) {
             $(".typing-indicator").remove();
             let cleanedData = data
